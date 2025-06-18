@@ -2,6 +2,10 @@ package com.example.turnos.controller;
 
 import com.example.turnos.model.Turno;
 import com.example.turnos.service.ITurnoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/turnos")
@@ -15,8 +19,8 @@ public class TurnoController {
     }
 
     @PostMapping
-    public Turno createTurno(@RequestBody Turno turno) {
-        return turnoService.createTurno(turno);
+    public void createTurno(@RequestBody Turno turno) {
+        turnoService.createTurno(turno);
     }
 
     @GetMapping("/{id}")
