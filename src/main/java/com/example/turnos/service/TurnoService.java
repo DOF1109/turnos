@@ -3,10 +3,12 @@ package com.example.turnos.service;
 import com.example.turnos.model.Turno;
 import com.example.turnos.repository.ITurnoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Service
 public class TurnoService implements ITurnoService {
     @Autowired
     private ITurnoRepository turnoRepository;
