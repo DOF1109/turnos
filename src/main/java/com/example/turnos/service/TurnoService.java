@@ -1,29 +1,52 @@
 package com.example.turnos.service;
 
+import com.example.turnos.model.Paciente;
 import com.example.turnos.model.Turno;
 import com.example.turnos.repository.ITurnoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 public class TurnoService implements ITurnoService {
+
     @Autowired
     private ITurnoRepository turnoRepository;
 
+    @Autowired
+    private RestTemplate apiConsumir;
+
     @Override
     public void saveTurno(LocalDate fecha, String tratamiento, String dniPaciente) {
-        // Paciente paciente = buscar en la api de pacientes
-        // String NombreCompletoPaciente = paciente.getNombte() + " " + paciente.getApellido();
+        try {
+            // Busca en la api de pacientes
+            Paciente paciente = apiConsumir.getForObject("http://localhost:9001/pacientes/dni/" + dniPaciente,
+                    Paciente.class);
 
-        Turno turno = new Turno();
-        turno.setFecha(fecha);
-        turno.setTratamiento(tratamiento);
-        turno.setNombreCompletoPaciente("Nombre completo del paciente");
+            if (paciente == null) {
+                throw new RuntimeException("No se encontró el paciente con DNI: " + dniPaciente);
+            }
 
-        turnoRepository.save(turno);
+            log.info("Paciente encontrado: {} {}", paciente.getNombre(), paciente.getApellido());
+
+            String nombreCompletoPaciente = paciente.getNombre() + " " + paciente.getApellido();
+
+            Turno turno = new Turno();
+            turno.setFecha(fecha);
+            turno.setTratamiento(tratamiento);
+            turno.setNombreCompletoPaciente(nombreCompletoPaciente);
+
+            turnoRepository.save(turno);
+            log.info("Turno guardado exitosamente");
+        } catch (Exception e) {
+            log.error("Error al guardar el turno: {}", e.getMessage());
+            throw new RuntimeException("Error al procesar el turno: " + e.getMessage());
+        }
     }
 
     @Override
